@@ -1,7 +1,7 @@
 // src/app/(storefront)/checkout/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCartStore } from "@/store/cart";
@@ -26,7 +26,15 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
 
-  if (items.length === 0) { router.replace("/cart"); return null; }
+  // ✅ Fix 1: router.replace moved out of render into useEffect
+  useEffect(() => {
+    if (items.length === 0) {
+      router.replace("/cart");
+    }
+  }, [items.length, router]);
+
+  // Prevent rendering the form while redirecting
+  if (items.length === 0) return null;
 
   function field(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -53,8 +61,14 @@ export default function CheckoutPage() {
           body: JSON.stringify({ items, form, subtotal, shipping, tax, total }),
         });
         const data = await res.json();
-        if (data.url) window.location.href = data.url;
-        else throw new Error(data.error || "Failed to create checkout session");
+        // ✅ Fix 2: guard window for SSR
+        if (data.url) {
+          if (typeof window !== "undefined") {
+            window.location.href = data.url;
+          }
+        } else {
+          throw new Error(data.error || "Failed to create checkout session");
+        }
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -110,9 +124,7 @@ export default function CheckoutPage() {
                 onClick={() => setPaymentMethod("stripe")}
                 className={cn(
                   "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
-                  paymentMethod === "stripe"
-                    ? "border-black bg-gray-50"
-                    : "border-gray-200 hover:border-gray-300"
+                  paymentMethod === "stripe" ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"
                 )}
               >
                 <CreditCard className="w-5 h-5 flex-shrink-0 text-gray-700" />
@@ -127,9 +139,7 @@ export default function CheckoutPage() {
                 onClick={() => setPaymentMethod("cod")}
                 className={cn(
                   "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
-                  paymentMethod === "cod"
-                    ? "border-black bg-gray-50"
-                    : "border-gray-200 hover:border-gray-300"
+                  paymentMethod === "cod" ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"
                 )}
               >
                 <Truck className="w-5 h-5 flex-shrink-0 text-gray-700" />
