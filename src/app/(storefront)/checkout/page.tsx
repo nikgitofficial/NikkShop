@@ -1,6 +1,8 @@
 // src/app/(storefront)/checkout/page.tsx
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -26,14 +28,12 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
 
-  // ✅ Fix 1: router.replace moved out of render into useEffect
   useEffect(() => {
     if (items.length === 0) {
       router.replace("/cart");
     }
   }, [items.length, router]);
 
-  // Prevent rendering the form while redirecting
   if (items.length === 0) return null;
 
   function field(key: keyof typeof form, value: string) {
@@ -61,7 +61,6 @@ export default function CheckoutPage() {
           body: JSON.stringify({ items, form, subtotal, shipping, tax, total }),
         });
         const data = await res.json();
-        // ✅ Fix 2: guard window for SSR
         if (data.url) {
           if (typeof window !== "undefined") {
             window.location.href = data.url;
