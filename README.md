@@ -204,6 +204,7 @@ External
 | Next.js | 15.1 | Framework (App Router) |
 | React | 19 | UI |
 | TypeScript | 5.7 | Type safety |
+| Resend | | For Password OTP Reset |
 | MongoDB + Mongoose | 8.9 | Database + ORM |
 | NextAuth | v5 beta | Authentication |
 | Vercel Blob | 0.27 | Image storage |
