@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   
   openGraph: {
     type: "website",
-    siteName: "NikShop",
+    siteName: "NikkShop",
     title: "NikkShop",
     description: "A modern multi-seller marketplace",
   },

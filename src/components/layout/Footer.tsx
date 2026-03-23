@@ -63,7 +63,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-base font-bold text-gray-900">Start selling on NikShop</h3>
+              <h3 className="text-base font-bold text-gray-900">Start selling on NikkShop</h3>
               <p className="text-sm text-gray-500 mt-0.5">
                 Join thousands of sellers reaching buyers worldwide.
               </p>
@@ -87,7 +87,7 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4 w-fit">
   <Image
     src="/logo.png"
-    alt="NikShop"
+    alt="NikkShop"
     width={120}
     height={38}
     className="object-contain h-9 w-auto"
@@ -146,7 +146,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-gray-400">
-              © {new Date().getFullYear()} NikShop. All rights reserved.
+              © {new Date().getFullYear()} NikkShop. All rights reserved.
             </p>
             <div className="flex items-center gap-1.5 flex-wrap justify-center">
               <span className="text-[10px] text-gray-300 mr-1">Built with</span>

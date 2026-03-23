@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     });
 
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "noreply@nikshop.com",
+      from: process.env.RESEND_FROM_EMAIL || "noreply@nikkshop.com",
       to: email,
       subject: "Your password reset code",
       html: `
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
           </div>
           <h1 style="font-size: 24px; font-weight: 700; color: #111; margin: 0 0 8px; text-align: center;">Reset your password</h1>
           <p style="font-size: 15px; color: #666; margin: 0 0 32px; text-align: center; line-height: 1.6;">
-            Enter this 6-digit code to reset your NikShop password. The code expires in 10 minutes.
+            Enter this 6-digit code to reset your NikkShop password. The code expires in 10 minutes.
           </p>
           <div style="background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 16px; padding: 28px; text-align: center; margin-bottom: 32px;">
             <span style="font-size: 40px; font-weight: 800; letter-spacing: 12px; color: #111; font-family: monospace;">${otp}</span>

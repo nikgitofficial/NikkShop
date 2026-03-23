@@ -8,19 +8,19 @@ export default function TermsPage() {
   const sections = [
     {
       title: "1. Acceptance of Terms",
-      body: "By accessing and using NikShop, you accept and agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use our platform.",
+      body: "By accessing and using NikkShop, you accept and agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use our platform.",
     },
     {
       title: "2. User Accounts",
-      body: "You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to create an account and make purchases on NikShop.",
+      body: "You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to create an account and make purchases on NikkShop.",
     },
     {
       title: "3. Seller Responsibilities",
-      body: "Sellers are responsible for accurate product descriptions, timely fulfillment, and compliance with all applicable laws. NikShop reserves the right to remove listings that violate our policies.",
+      body: "Sellers are responsible for accurate product descriptions, timely fulfillment, and compliance with all applicable laws. NikkShop reserves the right to remove listings that violate our policies.",
     },
     {
       title: "4. Payments",
-      body: "All payments are processed securely via Stripe. NikShop does not store your credit card information. Sellers receive payouts after order confirmation, minus applicable platform fees.",
+      body: "All payments are processed securely via Stripe. NikkShop does not store your credit card information. Sellers receive payouts after order confirmation, minus applicable platform fees.",
     },
     {
       title: "5. Returns & Refunds",
@@ -28,11 +28,11 @@ export default function TermsPage() {
     },
     {
       title: "6. Prohibited Items",
-      body: "Users may not list or purchase illegal items, counterfeit goods, hazardous materials, or any items that violate applicable laws or NikShop policies.",
+      body: "Users may not list or purchase illegal items, counterfeit goods, hazardous materials, or any items that violate applicable laws or NikkShop policies.",
     },
     {
       title: "7. Limitation of Liability",
-      body: "NikShop is a marketplace platform and is not responsible for the quality, safety, or legality of items listed by sellers. We facilitate transactions but are not a party to them.",
+      body: "NikkShop is a marketplace platform and is not responsible for the quality, safety, or legality of items listed by sellers. We facilitate transactions but are not a party to them.",
     },
     {
       title: "8. Contact",

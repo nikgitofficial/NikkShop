@@ -49,7 +49,7 @@ export default function RegisterPage() {
       toast.success("Account created!", {
         description: role === "SELLER"
           ? "Your seller account is pending admin approval"
-          : "Welcome to NikShop!",
+          : "Welcome to NikkShop!",
       });
       router.push("/login");
     } catch (err: any) {
@@ -69,7 +69,7 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create account</h1>
-          <p className="text-gray-400 text-sm">Join the NikShop marketplace</p>
+          <p className="text-gray-400 text-sm">Join the NikkShop marketplace</p>
         </div>
 
         {/* Role selector */}

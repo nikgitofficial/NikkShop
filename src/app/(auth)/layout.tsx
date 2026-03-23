@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Bottom */}
       <div className="p-6 text-center text-gray-400 text-xs">
-        © {new Date().getFullYear()} NikShop. All rights reserved.
+        © {new Date().getFullYear()} NikkShop. All rights reserved.
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ export function Navbar() {
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
   <Image
     src="/logo.png"
-    alt="NikShop"
+    alt="NikkShop"
     width={130}
     height={40}
     priority
@@ -231,7 +231,7 @@ export function Navbar() {
               <Link href="/" onClick={closeMobile} className="flex items-center gap-2">
   <Image
     src="/logo.png"
-    alt="NikShop"
+    alt="NikkShop"
     width={100}
     height={32}
     className="object-contain h-8 w-auto"

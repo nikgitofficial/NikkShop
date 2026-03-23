@@ -60,6 +60,6 @@ export const useCartStore = create<CartStore>()(
       totalItems: () => get().items.reduce((a, i) => a + i.quantity, 0),
       totalPrice: () => get().items.reduce((a, i) => a + i.price * i.quantity, 0),
     }),
-    { name: "NikShop-cart" }
+    { name: "NikkShop-cart" }
   )
 );

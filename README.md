@@ -1,4 +1,4 @@
-# NikShop 2026 — Full-Stack Multi-Seller Marketplace
+# NikkShop 2026 — Full-Stack Multi-Seller Marketplace
 
 A production-ready, senior-level e-commerce marketplace built with the latest stack. Dark luxury design, real product uploads via Vercel Blob, three user roles, and full Stripe payment flow.
 

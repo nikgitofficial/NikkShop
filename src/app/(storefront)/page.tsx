@@ -3,28 +3,45 @@ import Link from "next/link";
 import connectDB from "@/lib/mongodb";
 import Product from "@/lib/models/Product";
 import Category from "@/lib/models/Category";
+import User from "@/lib/models/User";
 import { serializeDoc } from "@/lib/utils";
 import { ArrowRight, Sparkles, ShieldCheck, Zap, TrendingUp, Tag, Star, Package } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
 
+function formatStat(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K+`;
+  return `${n}+`;
+}
+
 async function getData() {
   await connectDB();
-  const [featured, newest, topRated, categories] = await Promise.all([
+  const [featured, newest, topRated, categories, productCount, sellerCount, totalUsers] = await Promise.all([
     Product.find({ status: "published", featured: true }).limit(4).lean(),
     Product.find({ status: "published" }).sort({ createdAt: -1 }).limit(8).lean(),
     Product.find({ status: "published", rating: { $gt: 0 } }).sort({ rating: -1 }).limit(4).lean(),
     Category.find({ active: true }).sort({ order: 1, name: 1 }).limit(8).lean(),
+    Product.countDocuments({ status: "published" }),
+    User.countDocuments({ role: "SELLER" }),
+    User.countDocuments(),
   ]);
   return {
     featured: serializeDoc(featured),
     newest: serializeDoc(newest),
     topRated: serializeDoc(topRated),
     categories: serializeDoc(categories),
+    stats: { productCount, sellerCount, totalUsers },
   };
 }
 
 export default async function HomePage() {
-  const { featured, newest, topRated, categories } = await getData();
+  const { featured, newest, topRated, categories, stats } = await getData();
+
+  const statItems = [
+    { value: formatStat(stats.productCount), label: "Products" },
+    { value: formatStat(stats.sellerCount),  label: "Sellers" },
+    { value: formatStat(stats.totalUsers),   label: "Happy buyers" },
+  ];
 
   return (
     <div>
@@ -72,11 +89,7 @@ export default async function HomePage() {
 
           {/* Stats */}
           <div className="flex items-center justify-center gap-10 mt-12">
-            {[
-              { value: "10K+", label: "Products" },
-              { value: "2K+", label: "Sellers" },
-              { value: "50K+", label: "Happy buyers" },
-            ].map(({ value, label }) => (
+            {statItems.map(({ value, label }) => (
               <div key={label} className="text-center">
                 <p className="text-2xl font-bold text-gray-900">{value}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{label}</p>
@@ -240,7 +253,7 @@ export default async function HomePage() {
           <div className="relative overflow-hidden bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
             <Sparkles className="w-7 h-7 text-pink-500 mb-4" />
             <h3 className="text-xl font-bold text-gray-900 mb-2">Sell your products</h3>
-            <p className="text-gray-500 text-sm mb-5">Join 2,000+ sellers already growing on NikShop.</p>
+            <p className="text-gray-500 text-sm mb-5">Join {formatStat(stats.sellerCount)} sellers already growing on NikShop.</p>
             <Link
               href="/register?role=seller"
               className="inline-flex items-center gap-1.5 text-sm text-pink-600 font-semibold hover:text-pink-700 transition-colors"

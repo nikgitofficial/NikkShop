@@ -1,6 +1,6 @@
-// src/components/dashboard/DashboardSidebar.tsx
 "use client";
 
+// src/components/dashboard/DashboardSidebar.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Package, ShoppingCart, Tag, Users,
   LogOut, Plus, Store, BarChart3, ChevronRight,
-  MessageCircle, Settings, Menu, X,
+  MessageCircle, Settings, Menu, X, TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,6 @@ export function DashboardSidebar({ role, user }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  // Animate in on open, animate out before unmounting
   useEffect(() => {
     if (mobileOpen) {
       requestAnimationFrame(() => setVisible(true));
@@ -38,17 +37,19 @@ export function DashboardSidebar({ role, user }: Props) {
   }
 
   const adminLinks = [
-    { href: "/admin",            label: "Overview",     icon: LayoutDashboard, exact: true },
-    { href: "/admin/products",   label: "All Products", icon: Package },
-    { href: "/admin/orders",     label: "Orders",       icon: ShoppingCart },
-    { href: "/admin/categories", label: "Categories",   icon: Tag },
-    { href: "/admin/sellers",    label: "Sellers",      icon: Users },
-    { href: "/admin/chat",       label: "All Chats",    icon: MessageCircle },
-    { href: "/admin/account",    label: "My Profile",   icon: Settings },
+    { href: "/admin",              label: "Overview",     icon: LayoutDashboard, exact: true },
+    { href: "/admin/analytics",    label: "Analytics",    icon: TrendingUp },   // ← NEW
+    { href: "/admin/products",     label: "All Products", icon: Package },
+    { href: "/admin/orders",       label: "Orders",       icon: ShoppingCart },
+    { href: "/admin/categories",   label: "Categories",   icon: Tag },
+    { href: "/admin/sellers",      label: "Sellers",      icon: Users },
+    { href: "/admin/chat",         label: "All Chats",    icon: MessageCircle },
+    { href: "/admin/account",      label: "My Profile",   icon: Settings },
   ];
 
   const sellerLinks = [
-    { href: "/seller",              label: "Overview",    icon: BarChart3, exact: true },
+    { href: "/seller",              label: "Overview",    icon: BarChart3,    exact: true },
+    { href: "/seller/analytics",    label: "Analytics",   icon: TrendingUp },  // ← NEW
     { href: "/seller/products",     label: "My Products", icon: Package },
     { href: "/seller/products/new", label: "Add Product", icon: Plus },
     { href: "/seller/orders",       label: "My Orders",   icon: ShoppingCart },
@@ -72,7 +73,7 @@ export function DashboardSidebar({ role, user }: Props) {
             <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-display text-lg text-gray-900">NikShop</span>
+            <span className="font-display text-lg text-gray-900">NikkShop</span>
           </Link>
           {onClose && (
             <button
@@ -174,7 +175,7 @@ export function DashboardSidebar({ role, user }: Props) {
           <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
             <span className="text-white font-bold text-xs">S</span>
           </div>
-          <span className="font-display text-base text-gray-900">NikShop</span>
+          <span className="font-display text-base text-gray-900">NikkShop</span>
         </Link>
         <div className="flex items-center gap-2">
           <span className={cn(

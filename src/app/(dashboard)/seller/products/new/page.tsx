@@ -106,7 +106,7 @@ const tabs: {
       <div className="flex items-start justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-display text-gray-900">Create Product</h1>
-          <p className="text-gray-500 text-sm mt-1">Fill in the details to list your product on NikShop</p>
+          <p className="text-gray-500 text-sm mt-1">Fill in the details to list your product on NikkShop</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button

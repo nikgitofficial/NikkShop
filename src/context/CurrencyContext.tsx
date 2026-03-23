@@ -24,31 +24,32 @@ const CurrencyContext = createContext<CurrencyContextType>({
 });
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<Currency>("USD");
+  // Initialize directly from localStorage to avoid a flash of the wrong currency
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    if (typeof window === "undefined") return "USD";
+    const saved = localStorage.getItem("currency");
+    return saved === "PHP" ? "PHP" : "USD";
+  });
   const [rate, setRate] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Fetch live USD → PHP rate
+  // Fetch live USD → PHP rate whenever currency switches to PHP.
+  // Because currency is initialized from localStorage above, this also
+  // correctly fires on first load if the user previously selected PHP.
   useEffect(() => {
-    if (currency === "PHP") {
-      setLoading(true);
-      fetch("https://open.er-api.com/v6/latest/USD")
-        .then((r) => r.json())
-        .then((data) => {
-          if (data?.rates?.PHP) setRate(data.rates.PHP);
-        })
-        .catch(() => setRate(56)) // fallback rate
-        .finally(() => setLoading(false));
-    } else {
+    if (currency !== "PHP") {
       setRate(1);
+      return;
     }
+    setLoading(true);
+    fetch("https://open.er-api.com/v6/latest/USD")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.rates?.PHP) setRate(data.rates.PHP);
+      })
+      .catch(() => setRate(56)) // fallback rate
+      .finally(() => setLoading(false));
   }, [currency]);
-
-  // Persist selection
-  useEffect(() => {
-    const saved = localStorage.getItem("currency") as Currency | null;
-    if (saved === "USD" || saved === "PHP") setCurrencyState(saved);
-  }, []);
 
   function setCurrency(c: Currency) {
     setCurrencyState(c);

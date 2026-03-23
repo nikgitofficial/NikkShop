@@ -44,7 +44,7 @@ export default function LoginPage() {
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-          <p className="text-gray-400 text-sm">Sign in to your NikShop account</p>
+          <p className="text-gray-400 text-sm">Sign in to your NikkShop account</p>
         </div>
 
         {/* Google */}
