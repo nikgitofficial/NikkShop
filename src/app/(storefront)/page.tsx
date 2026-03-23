@@ -88,7 +88,7 @@ export default async function HomePage() {
         {/* Trust badges */}
         <div className="relative max-w-3xl mx-auto mt-20 grid grid-cols-3 gap-4">
           {[
-            { icon: ShieldCheck, label: "Secure Payments", sub: "Powered by Stripe" },
+            { icon: ShieldCheck, label: "Secure Payments", sub: "" },
             { icon: Zap, label: "Instant Delivery", sub: "Digital goods" },
             { icon: Sparkles, label: "Verified Sellers", sub: "Quality guaranteed" },
           ].map(({ icon: Icon, label, sub }) => (

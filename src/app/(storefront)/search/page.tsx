@@ -33,15 +33,15 @@ export default function SearchPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Search bar */}
       <div className="max-w-2xl mx-auto mb-14">
-        <h1 className="text-4xl font-display text-white text-center mb-8">Search Products</h1>
+        <h1 className="text-4xl font-display text-gray-900 text-center mb-8">Search Products</h1>
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           {loading && (
-            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 animate-spin" />
+            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 animate-spin" />
           )}
           <input
             autoFocus
-            className="w-full h-14 pl-12 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white text-base placeholder:text-white/25 outline-none transition-all focus:border-purple-500/40 focus:shadow-[0_0_0_3px_rgba(168,85,247,0.1)]"
+            className="w-full h-14 pl-12 pr-12 bg-white border border-gray-200 rounded-2xl text-gray-900 text-base placeholder:text-gray-400 outline-none transition-all focus:border-purple-400 focus:shadow-[0_0_0_3px_rgba(168,85,247,0.1)] shadow-sm"
             placeholder="Search for products, categories, sellers…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -51,24 +51,27 @@ export default function SearchPage() {
 
       {/* Results */}
       {!q.trim() && (
-        <div className="text-center py-16 text-white/20">
+        <div className="text-center py-16 text-gray-300">
           <Search className="w-16 h-16 mx-auto mb-4 opacity-30" />
-          <p className="text-lg">Start typing to search</p>
+          <p className="text-lg text-gray-400">Start typing to search</p>
         </div>
       )}
 
       {searched && !loading && results.length === 0 && (
         <div className="text-center py-16">
-          <Package className="w-14 h-14 mx-auto text-white/10 mb-4" />
-          <p className="text-white/40 text-lg mb-2">No results for "<span className="text-white/60">{q}</span>"</p>
-          <p className="text-white/25 text-sm">Try different keywords or browse categories</p>
+          <Package className="w-14 h-14 mx-auto text-gray-300 mb-4" />
+          <p className="text-gray-500 text-lg mb-2">
+            No results for "<span className="text-gray-700">{q}</span>"
+          </p>
+          <p className="text-gray-400 text-sm">Try different keywords or browse categories</p>
         </div>
       )}
 
       {results.length > 0 && (
         <>
-          <p className="text-sm text-white/40 mb-6">
-            {results.length} result{results.length !== 1 ? "s" : ""} for "<span className="text-white/70">{q}</span>"
+          <p className="text-sm text-gray-500 mb-6">
+            {results.length} result{results.length !== 1 ? "s" : ""} for "
+            <span className="text-gray-700">{q}</span>"
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {results.map((p) => <ProductCard key={p._id} product={p} />)}

@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Product from "@/lib/models/Product";
 import { getSession as auth } from "@/lib/auth";
 import mongoose from "mongoose";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -41,6 +42,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const body = await req.json();
     const updated = await Product.findByIdAndUpdate(id, body, { new: true }).lean();
+
+    // Bust cache so storefront reflects the update immediately
+    revalidatePath("/products");
+    revalidatePath("/");
+    revalidatePath(`/products/${(updated as any).slug}`);
+
     return NextResponse.json({ product: updated });
   } catch (err) {
     console.error("[PATCH /api/products]", err);
@@ -62,7 +69,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const isOwner = product.sellerId === session.user?.id;
     if (role !== "ADMIN" && !isOwner) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+    // Save slug before deleting so we can revalidate the product page
+    const slug = product.slug;
+
     await Product.findByIdAndDelete(id);
+
+    // Bust cache so deleted product disappears from storefront immediately
+    revalidatePath("/products");
+    revalidatePath("/");
+    revalidatePath(`/products/${slug}`);
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[DELETE /api/products]", err);
