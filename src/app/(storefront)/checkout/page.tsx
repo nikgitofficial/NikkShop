@@ -1,4 +1,3 @@
-// src/app/(storefront)/checkout/page.tsx
 "use client";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCartStore } from "@/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/context/CurrencyContext";
 import { toast } from "sonner";
 import { Loader2, Lock, ShieldCheck, ArrowLeft, Truck, CreditCard } from "lucide-react";
 import Link from "next/link";
@@ -16,6 +15,7 @@ import { cn } from "@/lib/utils";
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clearCart } = useCartStore();
+  const { format } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("stripe");
   const [form, setForm] = useState({
@@ -164,7 +164,7 @@ export default function CheckoutPage() {
               : <Lock className="w-5 h-5" />}
             {loading
               ? paymentMethod === "cod" ? "Placing order…" : "Redirecting to Stripe…"
-              : paymentMethod === "cod" ? `Place Order · ${formatPrice(total)}` : `Pay ${formatPrice(total)}`}
+              : paymentMethod === "cod" ? `Place Order · ${format(total)}` : `Pay ${format(total)}`}
           </button>
 
           <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
@@ -190,7 +190,7 @@ export default function CheckoutPage() {
                     <p className="text-sm text-gray-800 truncate font-medium">{item.name}</p>
                     <p className="text-xs text-gray-400">by {item.sellerName}</p>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900">{formatPrice(item.price * item.quantity)}</span>
+                  <span className="text-sm font-semibold text-gray-900">{format(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -198,9 +198,9 @@ export default function CheckoutPage() {
 
           <div className="space-y-2.5 text-sm">
             {[
-              { label: "Subtotal", value: formatPrice(subtotal) },
-              { label: "Shipping", value: shipping === 0 ? "Free" : formatPrice(shipping), color: shipping === 0 ? "text-emerald-500" : "" },
-              { label: "Tax (8%)", value: formatPrice(tax) },
+              { label: "Subtotal", value: format(subtotal) },
+              { label: "Shipping", value: shipping === 0 ? "Free" : format(shipping), color: shipping === 0 ? "text-emerald-500" : "" },
+              { label: "Tax (8%)", value: format(tax) },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex justify-between text-gray-500">
                 <span>{label}</span>
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
             <div className="my-2 h-px bg-gray-100" />
             <div className="flex justify-between font-bold text-lg">
               <span className="text-gray-700">Total</span>
-              <span className="text-gray-900">{formatPrice(total)}</span>
+              <span className="text-gray-900">{format(total)}</span>
             </div>
           </div>
         </div>

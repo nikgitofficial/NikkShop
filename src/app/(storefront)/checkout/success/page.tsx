@@ -1,4 +1,3 @@
-// src/app/(storefront)/checkout/success/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, ArrowRight, Loader2 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -14,6 +13,7 @@ export default function SuccessPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const clearCart = useCartStore((s) => s.clearCart);
+  const { format } = useCurrency();
 
   useEffect(() => {
     clearCart();
@@ -64,14 +64,16 @@ export default function SuccessPage() {
                     <p className="text-sm text-white/80">{item.productName}</p>
                     <p className="text-xs text-white/30">Qty: {item.quantity}</p>
                   </div>
-                  <span className="text-sm font-semibold text-white/70">{formatPrice(item.price * item.quantity)}</span>
+                  <span className="text-sm font-semibold text-white/70">
+                    {format(item.price * item.quantity)}
+                  </span>
                 </div>
               ))}
             </div>
 
             <div className="flex justify-between items-center px-5 py-4 border-t border-white/[0.06]">
               <span className="font-semibold text-white/80">Total</span>
-              <span className="text-xl font-bold text-white">{formatPrice(order.total)}</span>
+              <span className="text-xl font-bold text-white">{format(order.total)}</span>
             </div>
           </div>
         )}

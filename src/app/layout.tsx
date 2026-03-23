@@ -5,13 +5,19 @@ import { SessionProvider } from "@/components/shared/SessionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "NikShop — Modern Marketplace", template: "%s | NikShop" },
+  title: { default: "NikkShop", template: "%s | NikkShop" },
   description: "A modern multi-seller marketplace. Buy, sell, and discover unique products.",
   keywords: ["marketplace", "ecommerce", "shop", "sell online"],
+   icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
+  
   openGraph: {
     type: "website",
     siteName: "NikShop",
-    title: "NikShop — Modern Marketplace",
+    title: "NikkShop",
     description: "A modern multi-seller marketplace",
   },
 };

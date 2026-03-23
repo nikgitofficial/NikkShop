@@ -1,4 +1,5 @@
 // src/components/layout/Navbar.tsx
+// Place your logo file at: public/logo.png (or .svg / .jpg)
 "use client";
 
 import Link from "next/link";
@@ -29,7 +30,6 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Smooth open/close for mobile drawer
   useEffect(() => {
     if (mobileOpen) {
       requestAnimationFrame(() => setMobileVisible(true));
@@ -43,7 +43,6 @@ export function Navbar() {
     setTimeout(() => setMobileOpen(false), 250);
   }
 
-  // Close user menu on outside click
   useEffect(() => {
     if (!userMenuOpen) return;
     function handler(e: MouseEvent) {
@@ -73,12 +72,19 @@ export function Navbar() {
           <div className="flex h-16 items-center justify-between gap-4">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-              <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <span className="font-display text-xl text-gray-900 hidden sm:block">NikShop</span>
-            </Link>
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+  <Image
+    src="/logo.png"
+    alt="NikShop"
+    width={130}
+    height={40}
+    priority
+    className="object-contain h-9 w-auto"
+  />
+  <span className="text-lg font-bold text-gray-900 tracking-tight">
+    NikkShop
+  </span>
+</Link>
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-1">
@@ -200,7 +206,7 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* ── Mobile drawer ──────────────────────────────────── */}
+      {/* ── Mobile drawer ── */}
       {mobileOpen && (
         <div
           className={cn(
@@ -210,10 +216,8 @@ export function Navbar() {
           )}
           onClick={closeMobile}
         >
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40" />
 
-          {/* Panel — slides in from right */}
           <div
             className={cn(
               "relative w-72 max-w-[85vw] bg-white flex flex-col h-full shadow-2xl",
@@ -222,14 +226,20 @@ export function Navbar() {
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            {/* Mobile header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
-                <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
-                  <span className="text-white font-bold text-xs">S</span>
-                </div>
-                <span className="font-display text-base text-gray-900">NikShop</span>
-              </Link>
+              <Link href="/" onClick={closeMobile} className="flex items-center gap-2">
+  <Image
+    src="/logo.png"
+    alt="NikShop"
+    width={100}
+    height={32}
+    className="object-contain h-8 w-auto"
+  />
+  <span className="text-base font-bold text-gray-900 tracking-tight">
+    NikkShop
+  </span>
+</Link>
               <button
                 onClick={closeMobile}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -254,7 +264,6 @@ export function Navbar() {
 
               <div className="my-2 h-px bg-gray-100" />
 
-              {/* Authenticated links */}
               {session ? (
                 <>
                   {dashboardHref && (
@@ -280,7 +289,6 @@ export function Navbar() {
                 </>
               )}
 
-              {/* Currency switcher */}
               {mounted && (
                 <div className="pt-2 px-1">
                   <CurrencySwitcher />
@@ -288,7 +296,7 @@ export function Navbar() {
               )}
             </nav>
 
-            {/* User info + sign out — bottom */}
+            {/* User info + sign out */}
             {session && (
               <div className="p-4 border-t border-gray-100">
                 <div className="flex items-center gap-3 mb-3 px-2 py-1.5 rounded-xl bg-gray-50">

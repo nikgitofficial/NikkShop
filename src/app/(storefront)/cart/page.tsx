@@ -1,14 +1,14 @@
-// src/app/(storefront)/cart/page.tsx
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCartStore();
+  const { format } = useCurrency();
 
   const subtotal = totalPrice();
   const shipping = subtotal > 0 && subtotal < 75 ? 8.99 : 0;
@@ -74,7 +74,7 @@ export default function CartPage() {
                 </Link>
                 <p className="text-xs text-gray-400 mt-1">by {item.sellerName}</p>
                 <p className="text-sm font-semibold text-gray-600 mt-2">
-                  {formatPrice(item.price)}
+                  {format(item.price)}
                 </p>
               </div>
 
@@ -82,7 +82,7 @@ export default function CartPage() {
               <div className="flex flex-col items-end gap-2 flex-shrink-0">
                 {/* Total price */}
                 <p className="text-base font-bold text-gray-900">
-                  {formatPrice(item.price * item.quantity)}
+                  {format(item.price * item.quantity)}
                 </p>
 
                 {/* Quantity stepper */}
@@ -105,7 +105,7 @@ export default function CartPage() {
                   </button>
                 </div>
 
-                {/* Delete — always visible */}
+                {/* Delete */}
                 <button
                   onClick={() => removeItem(item.productId)}
                   className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg transition-all"
@@ -126,23 +126,23 @@ export default function CartPage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-500">
                 <span>Subtotal ({items.reduce((a, i) => a + i.quantity, 0)} items)</span>
-                <span className="font-medium text-gray-900">{formatPrice(subtotal)}</span>
+                <span className="font-medium text-gray-900">{format(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500">
                 <span>Shipping</span>
                 <span className={shipping === 0 ? "text-emerald-500 font-medium" : "font-medium text-gray-900"}>
-                  {shipping === 0 ? "Free" : formatPrice(shipping)}
+                  {shipping === 0 ? "Free" : format(shipping)}
                 </span>
               </div>
               <div className="flex justify-between text-gray-500">
                 <span>Tax (8%)</span>
-                <span className="font-medium text-gray-900">{formatPrice(tax)}</span>
+                <span className="font-medium text-gray-900">{format(tax)}</span>
               </div>
 
               {shipping > 0 && (
                 <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-600">
                   <Tag className="w-3.5 h-3.5 flex-shrink-0" />
-                  Add {formatPrice(75 - subtotal)} more for free shipping
+                  Add {format(75 - subtotal)} more for free shipping
                 </div>
               )}
             </div>
@@ -151,7 +151,7 @@ export default function CartPage() {
 
             <div className="flex justify-between items-center mb-6">
               <span className="font-semibold text-gray-700">Total</span>
-              <span className="text-2xl font-bold text-gray-900">{formatPrice(total)}</span>
+              <span className="text-2xl font-bold text-gray-900">{format(total)}</span>
             </div>
 
             <Link
