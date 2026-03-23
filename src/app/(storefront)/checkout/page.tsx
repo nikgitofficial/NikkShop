@@ -62,9 +62,7 @@ export default function CheckoutPage() {
         });
         const data = await res.json();
         if (data.url) {
-          if (typeof window !== "undefined") {
-            window.location.href = data.url;
-          }
+          window.location.href = data.url;
         } else {
           throw new Error(data.error || "Failed to create checkout session");
         }
