@@ -25,13 +25,22 @@ function emailTemplate(otp: string, name: string, year: number) {
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
           <tr>
             <td align="center" style="padding-bottom:28px;">
-              <img
-                src="https://nikk-shop.vercel.app/logo.png"
-                alt="NikkShop"
-                width="80"
-                height="80"
-                style="display:block;"
-              />
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align:middle;">
+                    <img
+                      src="https://nikk-shop.vercel.app/logo.png"
+                      alt="NikkShop"
+                      width="50"
+                      height="50"
+                      style="display:block;"
+                    />
+                  </td>
+                  <td style="padding-left:10px;vertical-align:middle;">
+                    <span style="font-size:20px;font-weight:800;color:#111;letter-spacing:-0.5px;">NikkShop</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>

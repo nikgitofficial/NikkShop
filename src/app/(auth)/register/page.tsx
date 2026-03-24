@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Loader2, User, Mail, Lock, Store, ShoppingBag, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -65,8 +66,14 @@ export default function RegisterPage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-sm">S</span>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Image
+              src="/logo.png"
+              alt="NikkShop"
+              width={40}
+              height={40}
+            />
+            <span className="text-xl font-bold text-gray-900 tracking-tight">NikkShop</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create account</h1>
           <p className="text-gray-400 text-sm">Join the NikkShop marketplace</p>
