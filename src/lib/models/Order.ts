@@ -20,6 +20,7 @@ export interface IOrder extends Document {
   userId?: string;
   userEmail: string;
   userName: string;
+  userPhone?: string;
   items: IOrderItem[];
   status: OrderStatus;
   paymentMethod: PaymentMethod;
@@ -49,6 +50,7 @@ const OrderSchema = new Schema<IOrder>(
     userId: String,
     userEmail: { type: String, required: true },
     userName: { type: String, required: true },
+    userPhone: { type: String },
     items: [
       {
         productId: String,

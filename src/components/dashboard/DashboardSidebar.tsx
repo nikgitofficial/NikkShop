@@ -38,7 +38,7 @@ export function DashboardSidebar({ role, user }: Props) {
 
   const adminLinks = [
     { href: "/admin",              label: "Overview",     icon: LayoutDashboard, exact: true },
-    { href: "/admin/analytics",    label: "Analytics",    icon: TrendingUp },   // ← NEW
+    { href: "/admin/analytics",    label: "Analytics",    icon: TrendingUp },
     { href: "/admin/products",     label: "All Products", icon: Package },
     { href: "/admin/orders",       label: "Orders",       icon: ShoppingCart },
     { href: "/admin/categories",   label: "Categories",   icon: Tag },
@@ -49,7 +49,7 @@ export function DashboardSidebar({ role, user }: Props) {
 
   const sellerLinks = [
     { href: "/seller",              label: "Overview",    icon: BarChart3,    exact: true },
-    { href: "/seller/analytics",    label: "Analytics",   icon: TrendingUp },  // ← NEW
+    { href: "/seller/analytics",    label: "Analytics",   icon: TrendingUp },
     { href: "/seller/products",     label: "My Products", icon: Package },
     { href: "/seller/products/new", label: "Add Product", icon: Plus },
     { href: "/seller/orders",       label: "My Orders",   icon: ShoppingCart },
@@ -69,11 +69,18 @@ export function DashboardSidebar({ role, user }: Props) {
       {/* Logo */}
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group" onClick={onClose}>
-            <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
-              <span className="text-white font-bold text-sm">S</span>
-            </div>
-            <span className="font-display text-lg text-gray-900">NikkShop</span>
+          <Link href="/" className="flex items-center gap-2 group" onClick={onClose}>
+            <Image
+              src="/logo.png"
+              alt="NikkShop"
+              width={130}
+              height={40}
+              priority
+              className="object-contain h-9 w-auto"
+            />
+            <span className="text-lg font-bold text-gray-900 tracking-tight">
+              NikkShop
+            </span>
           </Link>
           {onClose && (
             <button
@@ -172,10 +179,16 @@ export function DashboardSidebar({ role, user }: Props) {
       {/* ── Mobile top bar ────────────────────────────────── */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
-            <span className="text-white font-bold text-xs">S</span>
-          </div>
-          <span className="font-display text-base text-gray-900">NikkShop</span>
+          <Image
+            src="/logo.png"
+            alt="NikkShop"
+            width={100}
+            height={32}
+            className="object-contain h-8 w-auto"
+          />
+          <span className="text-base font-bold text-gray-900 tracking-tight">
+            NikkShop
+          </span>
         </Link>
         <div className="flex items-center gap-2">
           <span className={cn(

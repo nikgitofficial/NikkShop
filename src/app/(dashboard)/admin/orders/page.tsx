@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   Search,
   X,
+  Phone,
 } from "lucide-react";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -86,7 +87,6 @@ export default function AdminOrdersPage() {
     setUpdating(null);
   }
 
-  // Normalise query — strip leading "#" and whitespace, uppercase for comparison
   const query = search.replace(/^#\s*/, "").trim().toUpperCase();
 
   const filtered = orders
@@ -95,7 +95,6 @@ export default function AdminOrdersPage() {
 
   const hasSearch = query.length > 0;
 
-  // Highlights the matched segment inside the 8-char order ID
   function HighlightedId({ id }: { id: string }) {
     const shortId = id.slice(-8).toUpperCase();
     if (!hasSearch || !shortId.includes(query)) {
@@ -125,7 +124,6 @@ export default function AdminOrdersPage() {
         </Link>
 
         <div className="flex items-start justify-between gap-6">
-          {/* Title */}
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900 leading-tight">
               All Orders
@@ -137,7 +135,6 @@ export default function AdminOrdersPage() {
             </p>
           </div>
 
-          {/* Order ID search — top-right of header, compact & unobtrusive */}
           <div className="flex-shrink-0 mt-0.5">
             <div
               className={cn(
@@ -167,7 +164,6 @@ export default function AdminOrdersPage() {
                 </button>
               )}
             </div>
-            {/* Live feedback beneath the input */}
             {hasSearch && (
               <p className="text-[11px] mt-1.5 text-right pr-0.5">
                 {filtered.length === 0 ? (
@@ -299,6 +295,12 @@ export default function AdminOrdersPage() {
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate max-w-[130px]">{order.userName}</p>
                             <p className="text-xs text-gray-400 truncate max-w-[130px]">{order.userEmail}</p>
+                            {order.userPhone && (
+                              <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                <Phone className="w-3 h-3" />
+                                {order.userPhone}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </td>

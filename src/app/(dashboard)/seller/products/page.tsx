@@ -9,8 +9,10 @@ import {
   Plus, Package, Edit, Trash2, Eye, EyeOff,
   Search, TrendingUp, Loader2
 } from "lucide-react";
-import { formatPrice, formatRelative } from "@/lib/utils";
+import { formatRelative } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySwitcher } from "@/components/analytics/CurrencySwitcher";
 
 const STATUS_STYLES: Record<string, string> = {
   published: "bg-green-100 text-green-700",
@@ -19,7 +21,8 @@ const STATUS_STYLES: Record<string, string> = {
   pending: "bg-blue-100 text-blue-700",
 };
 
-export default function SellerProductsPage() {
+function SellerProductsInner() {
+  const { format } = useCurrency();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -90,12 +93,16 @@ export default function SellerProductsPage() {
           <h1 className="text-3xl font-display text-gray-900">My Products</h1>
           <p className="text-gray-500 text-sm mt-1">Manage and track your product listings</p>
         </div>
-        <Link
-          href="/seller/products/new"
-          className="flex items-center gap-2 px-5 py-2.5 text-sm text-white font-medium rounded-xl bg-black hover:bg-gray-800 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add Product
-        </Link>
+        {/* Currency switcher + Add Product — mirrors the analytics header */}
+        <div className="flex items-center gap-2">
+          <CurrencySwitcher />
+          <Link
+            href="/seller/products/new"
+            className="flex items-center gap-2 px-5 py-2.5 text-sm text-white font-medium rounded-xl bg-black hover:bg-gray-800 transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Add Product
+          </Link>
+        </div>
       </div>
 
       {/* Stats row */}
@@ -195,9 +202,10 @@ export default function SellerProductsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{formatPrice(product.price)}</p>
+                          {/* format() from useCurrency — converts + formats with correct symbol */}
+                          <p className="text-sm font-semibold text-gray-800">{format(product.price)}</p>
                           {product.compareAt && (
-                            <p className="text-xs text-gray-400 line-through">{formatPrice(product.compareAt)}</p>
+                            <p className="text-xs text-gray-400 line-through">{format(product.compareAt)}</p>
                           )}
                         </div>
                       </td>
@@ -252,5 +260,16 @@ export default function SellerProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Outer export wraps with CurrencyProvider so useCurrency() works inside
+import { CurrencyProvider } from "@/context/CurrencyContext";
+
+export default function SellerProductsPage() {
+  return (
+    <CurrencyProvider>
+      <SellerProductsInner />
+    </CurrencyProvider>
   );
 }

@@ -10,6 +10,9 @@ import { useCurrency } from "@/context/CurrencyContext";
 export default function SuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const orderId   = searchParams.get("order_id");
+  const method    = searchParams.get("method");
+
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const clearCart = useCartStore((s) => s.clearCart);
@@ -17,72 +20,112 @@ export default function SuccessPage() {
 
   useEffect(() => {
     clearCart();
-    if (!sessionId) { setLoading(false); return; }
-    fetch(`/api/orders/by-session?session_id=${sessionId}`)
-      .then((r) => r.json())
-      .then((d) => { setOrder(d.order); setLoading(false); });
-  }, [sessionId]);
+
+    if (orderId) {
+      fetch(`/api/orders/${orderId}`)
+        .then((r) => r.json())
+        .then((d) => { setOrder(d.order); setLoading(false); });
+      return;
+    }
+
+    if (sessionId) {
+      fetch(`/api/orders/by-session?session_id=${sessionId}`)
+        .then((r) => r.json())
+        .then((d) => { setOrder(d.order); setLoading(false); });
+      return;
+    }
+
+    setLoading(false);
+  }, [sessionId, orderId]);
+
+  // ✅ Show last 8 chars uppercase — matches "Order #EF8D8900" format on orders page
+  const shortId = (id: string) => id?.slice(-8).toUpperCase();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-20 text-center">
       {/* Glow orb */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-100 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative">
-        <div className="w-24 h-24 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6 animate-scale-in">
-          <CheckCircle className="w-12 h-12 text-emerald-400" />
+        {/* Check icon */}
+        <div className="w-24 h-24 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-12 h-12 text-emerald-500" />
         </div>
 
-        <h1 className="text-4xl font-display text-white mb-3 animate-slide-up">Order Confirmed!</h1>
-        <p className="text-white/50 text-lg mb-10 animate-slide-up animation-delay-100">
-          Thank you for your purchase. You'll receive a confirmation email shortly.
+        <h1 className="text-4xl font-bold text-gray-900 mb-3">Order Confirmed!</h1>
+        <p className="text-gray-500 text-lg mb-10">
+          {method === "cod"
+            ? "Your order has been placed. Please prepare payment upon delivery."
+            : "Thank you for your purchase. You'll receive a confirmation email shortly."}
         </p>
 
         {loading && (
-          <div className="flex items-center justify-center gap-2 text-white/40 mb-8">
+          <div className="flex items-center justify-center gap-2 text-gray-400 mb-8">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span className="text-sm">Loading order details...</span>
           </div>
         )}
 
         {order && (
-          <div className="glass border border-white/[0.08] rounded-2xl overflow-hidden text-left mb-8 animate-fade-in">
-            <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden text-left mb-8 shadow-sm">
+            {/* Order ID + Status */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <div>
-                <p className="text-xs text-white/30 mb-1">Order ID</p>
-                <p className="font-mono text-sm text-white/70">{order._id}</p>
+                <p className="text-xs text-gray-400 mb-1">Order ID</p>
+                {/* ✅ Matches orders page format: Order #EF8D8900 */}
+                <p className="font-mono text-sm font-semibold text-gray-800">
+                  Order #{shortId(order._id)}
+                </p>
               </div>
-              <span className="badge-green px-3 py-1 rounded-full text-xs font-semibold capitalize">
+              <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-semibold capitalize">
                 {order.status}
               </span>
             </div>
 
-            <div className="divide-y divide-white/[0.04]">
+            {/* COD notice */}
+            {method === "cod" && (
+              <div className="px-5 py-3 bg-amber-50 border-b border-amber-100">
+                <p className="text-xs text-amber-600 font-medium">
+                  💵 Cash on Delivery — please have the exact amount ready.
+                </p>
+              </div>
+            )}
+
+            {/* Items */}
+            <div className="divide-y divide-gray-50">
               {order.items?.map((item: any) => (
                 <div key={item.productId} className="flex justify-between items-center px-5 py-3">
                   <div>
-                    <p className="text-sm text-white/80">{item.productName}</p>
-                    <p className="text-xs text-white/30">Qty: {item.quantity}</p>
+                    <p className="text-sm text-gray-800 font-medium">{item.productName}</p>
+                    <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
                   </div>
-                  <span className="text-sm font-semibold text-white/70">
+                  <span className="text-sm font-semibold text-gray-700">
                     {format(item.price * item.quantity)}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-between items-center px-5 py-4 border-t border-white/[0.06]">
-              <span className="font-semibold text-white/80">Total</span>
-              <span className="text-xl font-bold text-white">{format(order.total)}</span>
+            {/* Total */}
+            <div className="flex justify-between items-center px-5 py-4 border-t border-gray-100 bg-gray-50">
+              <span className="font-semibold text-gray-700">Total</span>
+              <span className="text-xl font-bold text-gray-900">{format(order.total)}</span>
             </div>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center animate-slide-up animation-delay-200">
-          <Link href="/orders" className="flex items-center justify-center gap-2 px-7 py-3.5 glass border border-white/[0.1] hover:border-white/20 text-white/70 hover:text-white rounded-xl text-sm transition-all">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/orders"
+            className="flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-all"
+          >
             <Package className="w-4 h-4" /> View Orders
           </Link>
-          <Link href="/products" className="btn-glow flex items-center justify-center gap-2 px-7 py-3.5 text-white font-semibold rounded-xl text-sm">
+          <Link
+            href="/products"
+            className="flex items-center justify-center gap-2 px-7 py-3.5 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl text-sm transition-all"
+          >
             Continue Shopping <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

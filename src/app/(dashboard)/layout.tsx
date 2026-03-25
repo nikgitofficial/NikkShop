@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardChatWrapper } from "@/components/chat/DashboardChatWrapper";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -13,14 +14,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (role !== "SELLER" && role !== "ADMIN") redirect("/");
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar role={role} user={session.user as any} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 p-6 lg:p-8 overflow-auto">
-          {children}
+    <CurrencyProvider>
+      <div className="flex min-h-screen bg-gray-50">
+        <DashboardSidebar role={role} user={session.user as any} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 p-6 lg:p-8 overflow-auto">
+            {children}
+          </div>
         </div>
+        <DashboardChatWrapper />
       </div>
-      <DashboardChatWrapper />
-    </div>
+    </CurrencyProvider>
   );
 }

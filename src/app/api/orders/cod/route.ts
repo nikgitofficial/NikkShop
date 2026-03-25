@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
       userId: session?.user?.id || undefined,
       userEmail: form.email,
       userName: `${form.firstName} ${form.lastName}`,
+      userPhone: form.phone || "",
       items: items.map((i: any) => ({
         productId: i.productId,
         productName: i.name,

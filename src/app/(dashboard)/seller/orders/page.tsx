@@ -2,10 +2,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShoppingCart, Loader2, ChevronRight } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { ShoppingCart, Loader2, ChevronRight, Phone } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySwitcher } from "@/components/analytics/CurrencySwitcher";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const STATUS_STYLE: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -17,8 +20,9 @@ const STATUS_STYLE: Record<string, string> = {
   refunded: "bg-gray-100 text-gray-500",
 };
 
-export default function SellerOrdersPage() {
+function SellerOrdersInner() {
   const { data: session } = useSession();
+  const { format } = useCurrency();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -34,9 +38,12 @@ export default function SellerOrdersPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-display text-gray-900">My Orders</h1>
-        <p className="text-gray-500 text-sm mt-1">Orders containing your products</p>
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-display text-gray-900">My Orders</h1>
+          <p className="text-gray-500 text-sm mt-1">Orders containing your products</p>
+        </div>
+        <CurrencySwitcher />
       </div>
 
       {loading ? (
@@ -66,6 +73,12 @@ export default function SellerOrdersPage() {
                     <div>
                       <p className="text-xs text-gray-400 font-mono">#{order._id.slice(-8).toUpperCase()}</p>
                       <p className="text-sm font-medium text-gray-900">{order.userName}</p>
+                      {order.userPhone && (
+                        <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                          <Phone className="w-3 h-3" />
+                          {order.userPhone}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
                     </div>
                     <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLE[order.status] || "bg-gray-100 text-gray-500")}>
@@ -74,7 +87,7 @@ export default function SellerOrdersPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="text-base font-bold text-gray-900">{formatPrice(myTotal)}</p>
+                      <p className="text-base font-bold text-gray-900">{format(myTotal)}</p>
                       <p className="text-xs text-gray-400">{myItems.length} item{myItems.length !== 1 ? "s" : ""}</p>
                     </div>
                     <ChevronRight className={cn("w-4 h-4 text-gray-400 transition-transform", isOpen && "rotate-90")} />
@@ -90,9 +103,9 @@ export default function SellerOrdersPage() {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 truncate">{item.productName}</p>
-                          <p className="text-xs text-gray-400">Qty: {item.quantity} × {formatPrice(item.price)}</p>
+                          <p className="text-xs text-gray-400">Qty: {item.quantity} × {format(item.price)}</p>
                         </div>
-                        <span className="text-sm font-bold text-gray-800">{formatPrice(item.price * item.quantity)}</span>
+                        <span className="text-sm font-bold text-gray-800">{format(item.price * item.quantity)}</span>
                       </div>
                     ))}
                     {order.shippingAddress && (
@@ -101,6 +114,12 @@ export default function SellerOrdersPage() {
                         <p className="text-sm text-gray-600">
                           {order.shippingAddress.name} · {order.shippingAddress.line1}, {order.shippingAddress.city}
                         </p>
+                        {order.userPhone && (
+                          <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-1">
+                            <Phone className="w-3.5 h-3.5" />
+                            {order.userPhone}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -111,5 +130,13 @@ export default function SellerOrdersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SellerOrdersPage() {
+  return (
+    <CurrencyProvider>
+      <SellerOrdersInner />
+    </CurrencyProvider>
   );
 }

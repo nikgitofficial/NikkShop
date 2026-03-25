@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useCartStore } from "@/store/cart";
 import { useCurrency } from "@/context/CurrencyContext";
 import { toast } from "sonner";
-import { Loader2, Lock, ShieldCheck, ArrowLeft, Truck, CreditCard } from "lucide-react";
+import { Loader2, Lock, ShieldCheck, ArrowLeft, Truck, CreditCard, Phone } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,9 @@ export default function CheckoutPage() {
   const { format } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("stripe");
+  const [ready, setReady] = useState(false);
   const [form, setForm] = useState({
-    email: "", firstName: "", lastName: "",
+    email: "", phone: "", firstName: "", lastName: "",
     address: "", address2: "", city: "", state: "", zip: "", country: "PH",
   });
 
@@ -28,13 +29,19 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
 
+  // Mark component as mounted first
   useEffect(() => {
-    if (items.length === 0) {
+    setReady(true);
+  }, []);
+
+  // Only redirect to /cart after mount — prevents firing during navigation to success
+  useEffect(() => {
+    if (ready && items.length === 0) {
       router.replace("/cart");
     }
-  }, [items.length, router]);
+  }, [ready, items.length, router]);
 
-  if (items.length === 0) return null;
+  if (!ready || items.length === 0) return null;
 
   function field(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -52,7 +59,7 @@ export default function CheckoutPage() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to place order");
-        clearCart();
+        // ✅ Do NOT clearCart() here — success page handles it
         router.push(`/checkout/success?order_id=${data.orderId}&method=cod`);
       } else {
         const res = await fetch("/api/payments/create-session", {
@@ -85,7 +92,20 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
-            <input className="input-field" type="email" placeholder="Email address" value={form.email} onChange={(e) => field("email", e.target.value)} required />
+            <div className="space-y-3">
+              <input className="input-field" type="email" placeholder="Email address" value={form.email} onChange={(e) => field("email", e.target.value)} required />
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  className="input-field pl-10"
+                  type="tel"
+                  placeholder="Phone number"
+                  value={form.phone}
+                  onChange={(e) => field("phone", e.target.value)}
+                  required
+                />
+              </div>
+            </div>
           </div>
 
           <div>

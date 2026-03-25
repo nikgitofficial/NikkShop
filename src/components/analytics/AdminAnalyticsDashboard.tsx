@@ -1,6 +1,6 @@
+// src/components/analytics/AdminAnalyticsDashboard.tsx
 "use client";
 
-// src/components/analytics/AdminAnalyticsDashboard.tsx
 import { useState } from "react";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -10,9 +10,11 @@ import {
 import {
   DollarSign, ShoppingBag, Package, Users, Store,
   TrendingUp, ArrowUpRight, ArrowDownRight, BarChart2,
-  Eye, Crown, CheckCircle, XCircle, Clock, Truck,
+  Crown, CheckCircle, XCircle, Clock, Truck,
   RotateCcw, AlertCircle,
 } from "lucide-react";
+import { CurrencySwitcher } from "@/components/ui/CurrencySwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
 
 // ── Types ────────────────────────────────────────────────────────
 interface Props {
@@ -51,42 +53,11 @@ const STATUS_META: Record<string, { color: string; icon: React.ElementType; labe
   refunded:  { color: "#6b7280", icon: RotateCcw,    label: "Refunded" },
 };
 
-// ── Helpers ──────────────────────────────────────────────────────
-function fmt(n: number) {
-  if (n >= 1_000_000) return `₱${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `₱${(n / 1_000).toFixed(1)}K`;
-  return `₱${n.toFixed(0)}`;
-}
-function fmtFull(n: number) {
-  return `₱${n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 function fmtDate(s?: string) {
   if (!s) return "—";
   return new Date(s).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
 }
 
-// ── Tooltip ──────────────────────────────────────────────────────
-const ChartTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-100 rounded-2xl shadow-xl p-3.5 text-sm min-w-[140px]">
-      <p className="font-semibold text-gray-700 mb-2 text-xs uppercase tracking-wider">{label}</p>
-      {payload.map((p: any) => (
-        <div key={p.name} className="flex items-center justify-between gap-4">
-          <span className="flex items-center gap-1.5 text-xs text-gray-500">
-            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
-            {p.name}
-          </span>
-          <span className="text-xs font-bold text-gray-800">
-            {p.name === "Revenue" ? fmtFull(p.value) : p.value.toLocaleString()}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// ── Status badge ─────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const meta = STATUS_META[status] ?? { color: "#6b7280", icon: AlertCircle, label: status };
   return (
@@ -100,7 +71,6 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// ── Main component ───────────────────────────────────────────────
 type ChartTab = "revenue" | "orders" | "units" | "newUsers";
 
 export function AdminAnalyticsDashboard({
@@ -108,6 +78,16 @@ export function AdminAnalyticsDashboard({
   categoryData, statusBreakdown, recentOrders,
 }: Props) {
   const [chartTab, setChartTab] = useState<ChartTab>("revenue");
+  const { format, convert, currency } = useCurrency();
+
+  // Abbreviated formatter for charts (respects currency)
+  function fmt(n: number) {
+    const c = convert(n);
+    const symbol = currency === "PHP" ? "₱" : "$";
+    if (c >= 1_000_000) return `${symbol}${(c / 1_000_000).toFixed(2)}M`;
+    if (c >= 1_000) return `${symbol}${(c / 1_000).toFixed(1)}K`;
+    return `${symbol}${c.toFixed(0)}`;
+  }
 
   const maxSellerRev = Math.max(...topSellers.map((s) => s.revenue), 1);
   const maxProductRev = Math.max(...topProducts.map((p) => p.revenue), 1);
@@ -117,9 +97,15 @@ export function AdminAnalyticsDashboard({
     .sort((a, b) => b.revenue - a.revenue);
   const totalStatusRev = statusEntries.reduce((s, e) => s + e.revenue, 0);
 
+  // Convert monthly chart data for the revenue axis
+  const convertedChartData = monthlyChartData.map((d) => ({
+    ...d,
+    revenue: convert(d.revenue),
+  }));
+
   const kpiCards = [
     {
-      label: "Platform Revenue", value: fmtFull(kpis.totalRevenue),
+      label: "Platform Revenue", value: format(kpis.totalRevenue),
       icon: DollarSign, color: "#059669", bg: "#f0fdf4", border: "#bbf7d0",
       sub: `${kpis.momGrowth >= 0 ? "+" : ""}${kpis.momGrowth.toFixed(1)}% vs last month`,
       up: kpis.momGrowth >= 0,
@@ -130,7 +116,7 @@ export function AdminAnalyticsDashboard({
       sub: `${kpis.totalUnits.toLocaleString()} units sold`, up: true,
     },
     {
-      label: "Avg Order Value", value: fmtFull(kpis.avgOrderValue),
+      label: "Avg Order Value", value: format(kpis.avgOrderValue),
       icon: TrendingUp, color: "#0284c7", bg: "#eff6ff", border: "#bfdbfe",
       sub: "per transaction", up: true,
     },
@@ -158,6 +144,26 @@ export function AdminAnalyticsDashboard({
     { key: "newUsers", label: "New Users" },
   ];
 
+  const ChartTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-xl p-3.5 text-sm min-w-[140px]">
+        <p className="font-semibold text-gray-700 mb-2 text-xs uppercase tracking-wider">{label}</p>
+        {payload.map((p: any) => (
+          <div key={p.name} className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-1.5 text-xs text-gray-500">
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
+              {p.name}
+            </span>
+            <span className="text-xs font-bold text-gray-800">
+              {p.name === "Revenue" ? format(p.value) : p.value.toLocaleString()}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto pb-16">
 
@@ -171,20 +177,19 @@ export function AdminAnalyticsDashboard({
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Platform Analytics</h1>
           <p className="text-sm text-gray-400 mt-1">Full marketplace overview · last 12 months</p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-50 border border-violet-100">
-          <Crown className="w-4 h-4 text-violet-500" />
-          <span className="text-xs font-semibold text-violet-700">Admin View</span>
+        <div className="flex items-center gap-3">
+          <CurrencySwitcher />
+          <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-50 border border-violet-100">
+            <Crown className="w-4 h-4 text-violet-500" />
+            <span className="text-xs font-semibold text-violet-700">Admin View</span>
+          </div>
         </div>
       </div>
 
       {/* ── KPI Cards ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-8">
         {kpiCards.map(({ label, value, icon: Icon, color, bg, border, sub, up }) => (
-          <div
-            key={label}
-            className="rounded-2xl p-4 shadow-sm border"
-            style={{ background: bg, borderColor: border }}
-          >
+          <div key={label} className="rounded-2xl p-4 shadow-sm border" style={{ background: bg, borderColor: border }}>
             <div className="flex items-center justify-between mb-3">
               <Icon className="w-4 h-4" style={{ color }} />
               <span className="text-[10px] font-semibold flex items-center gap-0.5" style={{ color }}>
@@ -220,7 +225,7 @@ export function AdminAnalyticsDashboard({
           </div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={monthlyChartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+          <AreaChart data={convertedChartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="adminGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.18} />
@@ -230,7 +235,7 @@ export function AdminAnalyticsDashboard({
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
             <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
             <YAxis
-              tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={64}
+              tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={72}
               tickFormatter={(v: number) => chartTab === "revenue" ? fmt(v) : v.toLocaleString()}
             />
             <Tooltip content={<ChartTooltip />} />
@@ -238,8 +243,7 @@ export function AdminAnalyticsDashboard({
               type="monotone"
               dataKey={chartTab}
               name={chartTabs.find((t) => t.key === chartTab)?.label ?? chartTab}
-              stroke="#7c3aed"
-              strokeWidth={2.5}
+              stroke="#7c3aed" strokeWidth={2.5}
               fill="url(#adminGrad)"
               dot={{ r: 3, fill: "#7c3aed", strokeWidth: 0 }}
               activeDot={{ r: 5, fill: "#7c3aed", strokeWidth: 0 }}
@@ -250,8 +254,6 @@ export function AdminAnalyticsDashboard({
 
       {/* ── Row 2: Top Sellers + Category Pie ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-
-        {/* Top Sellers */}
         <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-1">Top Sellers</h2>
           <p className="text-xs text-gray-400 mb-5">Ranked by platform revenue generated</p>
@@ -292,7 +294,6 @@ export function AdminAnalyticsDashboard({
           )}
         </div>
 
-        {/* Category Donut */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-1">Revenue by Category</h2>
           <p className="text-xs text-gray-400 mb-4">Platform-wide share</p>
@@ -305,19 +306,11 @@ export function AdminAnalyticsDashboard({
             <>
               <ResponsiveContainer width="100%" height={190}>
                 <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%" cy="50%"
-                    innerRadius={55} outerRadius={85}
-                    dataKey="revenue" paddingAngle={2}
-                  >
-                    {categoryData.map((_, i) => (
-                      <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                    ))}
+                  <Pie data={categoryData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} dataKey="revenue" paddingAngle={2}>
+                    {categoryData.map((_, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}
                   </Pie>
                   <Tooltip
-                    
-                     formatter={(v: any) => fmtFull(Number(v ?? 0))}
+                    formatter={(v: any) => format(Number(v ?? 0))}
                     contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
                   />
                 </PieChart>
@@ -340,8 +333,6 @@ export function AdminAnalyticsDashboard({
 
       {/* ── Row 3: Top Products + Order Status ──────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-
-        {/* Top Products */}
         <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-1">Top Products</h2>
           <p className="text-xs text-gray-400 mb-5">Best-selling across all sellers</p>
@@ -371,10 +362,7 @@ export function AdminAnalyticsDashboard({
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="h-full bg-violet-500 rounded-full"
-                          style={{ width: `${(p.revenue / maxProductRev) * 100}%` }}
-                        />
+                        <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(p.revenue / maxProductRev) * 100}%` }} />
                       </div>
                       <span className="text-[10px] text-gray-400 flex-shrink-0">{p.units} sold</span>
                     </div>
@@ -385,7 +373,6 @@ export function AdminAnalyticsDashboard({
           )}
         </div>
 
-        {/* Order Status */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-1">Order Status</h2>
           <p className="text-xs text-gray-400 mb-5">Revenue & count by state</p>
@@ -395,15 +382,8 @@ export function AdminAnalyticsDashboard({
             <>
               <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie
-                    data={statusEntries}
-                    cx="50%" cy="50%"
-                    innerRadius={45} outerRadius={72}
-                    dataKey="count" paddingAngle={2}
-                  >
-                    {statusEntries.map((e) => (
-                      <Cell key={e.name} fill={STATUS_META[e.name]?.color ?? "#6b7280"} />
-                    ))}
+                  <Pie data={statusEntries} cx="50%" cy="50%" innerRadius={45} outerRadius={72} dataKey="count" paddingAngle={2}>
+                    {statusEntries.map((e) => <Cell key={e.name} fill={STATUS_META[e.name]?.color ?? "#6b7280"} />)}
                   </Pie>
                   <Tooltip
                     formatter={(v: any, name: any) => [Number(v ?? 0).toLocaleString(), String(name ?? "")]}
@@ -411,7 +391,6 @@ export function AdminAnalyticsDashboard({
                   />
                 </PieChart>
               </ResponsiveContainer>
-
               <div className="space-y-2.5 mt-3">
                 {statusEntries.map((e) => {
                   const pct = totalStatusRev > 0 ? (e.revenue / totalStatusRev) * 100 : 0;
@@ -438,9 +417,8 @@ export function AdminAnalyticsDashboard({
         </div>
       </div>
 
-      {/* ── Row 4: Monthly Bar (Orders+Units) + User Growth ─── */}
+      {/* ── Row 4: Monthly Bar + User Growth ─────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-1">Orders & Units</h2>
           <p className="text-xs text-gray-400 mb-5">Monthly volume</p>
@@ -505,7 +483,7 @@ export function AdminAnalyticsDashboard({
                       {o.itemCount} item{o.itemCount !== 1 ? "s" : ""}
                     </td>
                     <td className="px-6 py-3.5 font-semibold text-gray-900 text-sm">
-                      {fmtFull(o.total)}
+                      {format(o.total)}
                     </td>
                     <td className="px-6 py-3.5">
                       <StatusBadge status={o.status} />
@@ -520,7 +498,6 @@ export function AdminAnalyticsDashboard({
           </div>
         )}
       </div>
-
     </div>
   );
 }

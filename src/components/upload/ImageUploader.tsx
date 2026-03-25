@@ -4,7 +4,7 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
-import { Upload, X, Star, Loader2, ImagePlus, AlertCircle } from "lucide-react";
+import { X, Star, Loader2, ImagePlus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -77,7 +77,6 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
 
   function removeImage(idx: number) {
     const updated = value.filter((_, i) => i !== idx);
-    // Re-assign primary if removed
     if (value[idx].isPrimary && updated.length > 0) {
       updated[0].isPrimary = true;
     }
@@ -103,25 +102,25 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
           className={cn(
             "relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200",
             isDragActive
-              ? "border-purple-500/60 bg-purple-500/10 scale-[1.01]"
-              : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]",
+              ? "border-black/40 bg-gray-100 scale-[1.01]"
+              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50",
             isUploading && "opacity-50 cursor-not-allowed"
           )}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-3">
             {isUploading ? (
-              <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
+              <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
             ) : (
               <div className={cn(
                 "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
-                isDragActive ? "bg-purple-500/20" : "bg-white/5"
+                isDragActive ? "bg-gray-200" : "bg-gray-100"
               )}>
-                <ImagePlus className={cn("w-6 h-6", isDragActive ? "text-purple-400" : "text-white/30")} />
+                <ImagePlus className={cn("w-6 h-6", isDragActive ? "text-gray-700" : "text-gray-400")} />
               </div>
             )}
             <div>
-              <p className="text-sm font-medium text-white/70">
+              <p className="text-sm font-medium text-gray-700">
                 {isUploading
                   ? `Uploading ${uploading.length} image${uploading.length > 1 ? "s" : ""}...`
                   : isDragActive
@@ -129,8 +128,8 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
                   : "Drag & drop images here"}
               </p>
               {!isUploading && (
-                <p className="text-xs text-white/30 mt-1">
-                  or <span className="text-purple-400 underline">browse</span> · PNG, JPG, WebP up to 5MB · {value.length}/{maxImages} used
+                <p className="text-xs text-gray-400 mt-1">
+                  or <span className="text-black underline cursor-pointer">browse</span> · PNG, JPG, WebP up to 5MB · {value.length}/{maxImages} used
                 </p>
               )}
             </div>
@@ -145,24 +144,24 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
             <div key={img.url} className="group relative">
               <div className={cn(
                 "relative aspect-square rounded-xl overflow-hidden border-2 transition-all",
-                img.isPrimary ? "border-purple-500/60 shadow-[0_0_20px_rgba(168,85,247,0.2)]" : "border-white/10"
+                img.isPrimary ? "border-black shadow-md" : "border-gray-200"
               )}>
                 <Image src={img.url} alt={img.alt || ""} fill className="object-cover" sizes="200px" />
 
                 {/* Primary badge */}
                 {img.isPrimary && (
-                  <div className="absolute top-2 left-2 flex items-center gap-1 bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <div className="absolute top-2 left-2 flex items-center gap-1 bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                     <Star className="w-2.5 h-2.5" /> Primary
                   </div>
                 )}
 
                 {/* Overlay actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   {!img.isPrimary && (
                     <button
                       type="button"
                       onClick={() => setPrimary(idx)}
-                      className="p-2 bg-purple-500 rounded-lg text-white hover:bg-purple-600 transition-colors"
+                      className="p-2 bg-white rounded-lg text-gray-800 hover:bg-gray-100 transition-colors"
                       title="Set as primary"
                     >
                       <Star className="w-3.5 h-3.5" />
@@ -171,7 +170,7 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="p-2 bg-red-500/80 rounded-lg text-white hover:bg-red-500 transition-colors"
+                    className="p-2 bg-red-500 rounded-lg text-white hover:bg-red-600 transition-colors"
                     title="Remove"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -185,7 +184,7 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
                 placeholder="Alt text..."
                 value={img.alt || ""}
                 onChange={(e) => updateAlt(idx, e.target.value)}
-                className="mt-1.5 w-full text-xs bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-white/60 placeholder:text-white/20 outline-none focus:border-purple-500/40 transition-colors"
+                className="mt-1.5 w-full text-xs bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-600 placeholder:text-gray-300 outline-none focus:border-gray-400 transition-colors"
               />
             </div>
           ))}
@@ -193,7 +192,7 @@ export function ImageUploader({ value, onChange, maxImages = 8 }: Props) {
       )}
 
       {value.length === 0 && !isUploading && (
-        <div className="flex items-center gap-2 text-xs text-white/30">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           <AlertCircle className="w-3.5 h-3.5" />
           At least one product image is required
         </div>

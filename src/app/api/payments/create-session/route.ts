@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         userId: session?.user?.id || "",
         userEmail: form.email,
+        userPhone: form.phone || "",
         userName: `${form.firstName} ${form.lastName}`,
-        // Only store essential IDs — full details fetched from DB in webhook
         items: JSON.stringify(items.map((i: any) => ({
           productId: i.productId,
           sellerId: i.sellerId,
