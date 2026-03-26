@@ -14,9 +14,11 @@ import {
   ArrowLeft,
   X,
 } from "lucide-react";
-import { formatPrice, formatRelative } from "@/lib/utils";
+import { formatRelative } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { CurrencySwitcher } from "@/components/ui/CurrencySwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const STATUS_STYLE: Record<string, { pill: string; dot: string; label: string }> = {
   published: { pill: "bg-emerald-50 border-emerald-200 text-emerald-700", dot: "bg-emerald-500", label: "Published" },
@@ -38,6 +40,8 @@ export default function AdminProductsPage() {
   const [search, setSearch]       = useState("");
   const [statusFilter, setStatus] = useState("all");
   const [actioning, setActioning] = useState<string | null>(null);
+
+  const { format } = useCurrency();
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -117,6 +121,10 @@ export default function AdminProductsPage() {
                 : "Manage products across all sellers"}
             </p>
           </div>
+          {/* Currency Switcher — matches analytics header placement */}
+          <div className="flex-shrink-0 mt-1">
+            <CurrencySwitcher />
+          </div>
         </div>
       </div>
 
@@ -127,7 +135,7 @@ export default function AdminProductsPage() {
           { label: "Published", value: stats.published, color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200",     iconBg: "bg-emerald-100" },
           { label: "Draft",     value: stats.draft,     color: "text-gray-500",    bg: "bg-gray-50 border-gray-200",           iconBg: "bg-gray-200" },
           { label: "Archived",  value: stats.archived,  color: "text-amber-600",   bg: "bg-amber-50 border-amber-200",         iconBg: "bg-amber-100" },
-        ].map(({ label, value, color, bg, iconBg }) => (
+        ].map(({ label, value, color, bg }) => (
           <div key={label} className={`border rounded-2xl p-4 shadow-sm ${bg}`}>
             <p className="text-xs font-semibold text-gray-400 mb-2">{label}</p>
             <p className={`text-2xl font-bold ${color}`}>{value.toLocaleString()}</p>
@@ -275,9 +283,9 @@ export default function AdminProductsPage() {
                         </span>
                       </td>
 
-                      {/* Price */}
+                      {/* Price — now uses format() from useCurrency */}
                       <td className="px-4 py-3.5">
-                        <p className="text-sm font-bold text-gray-800">{formatPrice(product.price)}</p>
+                        <p className="text-sm font-bold text-gray-800">{format(product.price)}</p>
                       </td>
 
                       {/* Stock */}

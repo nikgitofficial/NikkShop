@@ -13,9 +13,11 @@ import {
   X,
   Phone,
 } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { CurrencySwitcher } from "@/components/ui/CurrencySwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const STATUSES = [
   "pending",
@@ -58,6 +60,8 @@ export default function AdminOrdersPage() {
   const [filter, setFilter]     = useState("all");
   const [search, setSearch]     = useState("");
   const searchRef               = useRef<HTMLInputElement>(null);
+
+  const { format } = useCurrency();
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -135,53 +139,59 @@ export default function AdminOrdersPage() {
             </p>
           </div>
 
-          <div className="flex-shrink-0 mt-0.5">
-            <div
-              className={cn(
-                "flex items-center gap-2 bg-white border rounded-xl px-3 py-2 shadow-sm transition-all duration-150",
-                hasSearch
-                  ? "border-gray-400 ring-2 ring-gray-900/5"
-                  : "border-gray-200 hover:border-gray-300"
-              )}
-            >
-              <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-              <input
-                ref={searchRef}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Order ID…"
-                spellCheck={false}
-                className="w-44 text-xs text-gray-700 placeholder:text-gray-400 bg-transparent outline-none font-mono tracking-wide"
-              />
+          <div className="flex items-start gap-3 flex-shrink-0 mt-0.5">
+            {/* Currency Switcher */}
+            <CurrencySwitcher />
+
+            {/* Search */}
+            <div>
+              <div
+                className={cn(
+                  "flex items-center gap-2 bg-white border rounded-xl px-3 py-2 shadow-sm transition-all duration-150",
+                  hasSearch
+                    ? "border-gray-400 ring-2 ring-gray-900/5"
+                    : "border-gray-200 hover:border-gray-300"
+                )}
+              >
+                <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search Order ID…"
+                  spellCheck={false}
+                  className="w-44 text-xs text-gray-700 placeholder:text-gray-400 bg-transparent outline-none font-mono tracking-wide"
+                />
+                {hasSearch && (
+                  <button
+                    onClick={() => { setSearch(""); searchRef.current?.focus(); }}
+                    className="p-0.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
               {hasSearch && (
-                <button
-                  onClick={() => { setSearch(""); searchRef.current?.focus(); }}
-                  className="p-0.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
+                <p className="text-[11px] mt-1.5 text-right pr-0.5">
+                  {filtered.length === 0 ? (
+                    <span className="text-red-400 font-medium">No match for #{query}</span>
+                  ) : (
+                    <span className="text-gray-400">
+                      {filtered.length} result{filtered.length !== 1 ? "s" : ""}{" "}
+                      <span className="text-gray-300">·</span>{" "}
+                      <button
+                        onClick={() => setSearch("")}
+                        className="text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
+                      >
+                        clear
+                      </button>
+                    </span>
+                  )}
+                </p>
               )}
             </div>
-            {hasSearch && (
-              <p className="text-[11px] mt-1.5 text-right pr-0.5">
-                {filtered.length === 0 ? (
-                  <span className="text-red-400 font-medium">No match for #{query}</span>
-                ) : (
-                  <span className="text-gray-400">
-                    {filtered.length} result{filtered.length !== 1 ? "s" : ""}{" "}
-                    <span className="text-gray-300">·</span>{" "}
-                    <button
-                      onClick={() => setSearch("")}
-                      className="text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
-                    >
-                      clear
-                    </button>
-                  </span>
-                )}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -324,9 +334,9 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
 
-                      {/* Total */}
+                      {/* Total — now uses format() from useCurrency */}
                       <td className="px-4 py-3.5">
-                        <p className="text-sm font-bold text-gray-800">{formatPrice(order.total)}</p>
+                        <p className="text-sm font-bold text-gray-800">{format(order.total)}</p>
                       </td>
 
                       {/* Date */}
