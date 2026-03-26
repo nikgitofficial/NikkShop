@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ImageUploader, type UploadedImage } from "@/components/upload/ImageUploader";
 import {
-  Package, DollarSign, Hash, FileText,
-  ChevronRight, Save, Eye, Loader2, Info
+  Package, Hash, FileText,
+  ChevronRight, Save, Eye, Loader2, Info, DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySwitcher } from "@/components/analytics/CurrencySwitcher";
 
 const CATEGORIES = [
   "Electronics", "Clothing & Apparel", "Home & Garden", "Sports & Outdoors",
@@ -37,6 +39,11 @@ export default function NewProductPage() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"basic" | "images" | "pricing" | "details">("basic");
+  const { format, convert, currency } = useCurrency();
+
+  // Dynamic currency symbol and label for price inputs
+  const currencySymbol = currency === "PHP" ? "₱" : "$";
+  const currencyLabel = currency === "PHP" ? "PHP" : "USD";
 
   function set(key: keyof FormState, value: any) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -81,17 +88,25 @@ export default function NewProductPage() {
     }
   }
 
-const tabs: {
-  id: "basic" | "images" | "pricing" | "details";
-  label: string;
-  icon: React.ElementType;
-  badge?: number;
-}[] = [
-  { id: "basic", label: "Basic Info", icon: FileText },
-  { id: "images", label: "Images", icon: Package, badge: form.images.length || undefined },
-  { id: "pricing", label: "Pricing", icon: DollarSign },
-  { id: "details", label: "Details", icon: Hash },
-];
+  // Preview converted prices (display only — stored values remain USD)
+  const previewPrice = form.price ? format(parseFloat(form.price)) : null;
+  const previewCompareAt = form.compareAt ? format(parseFloat(form.compareAt)) : null;
+  const discountPct =
+    form.price && form.compareAt && parseFloat(form.compareAt) > parseFloat(form.price)
+      ? Math.round(((parseFloat(form.compareAt) - parseFloat(form.price)) / parseFloat(form.compareAt)) * 100)
+      : null;
+
+  const tabs: {
+    id: "basic" | "images" | "pricing" | "details";
+    label: string;
+    icon: React.ElementType;
+    badge?: number;
+  }[] = [
+    { id: "basic", label: "Basic Info", icon: FileText },
+    { id: "images", label: "Images", icon: Package, badge: form.images.length || undefined },
+    { id: "pricing", label: "Pricing", icon: DollarSign },
+    { id: "details", label: "Details", icon: Hash },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -109,6 +124,9 @@ const tabs: {
           <p className="text-gray-500 text-sm mt-1">Fill in the details to list your product on NikkShop</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Currency Switcher — same as analytics dashboard */}
+          <CurrencySwitcher />
+
           <button
             type="button"
             onClick={(e) => submit(e, true)}
@@ -235,11 +253,22 @@ const tabs: {
           {/* PRICING */}
           {activeTab === "pricing" && (
             <div className="space-y-5 animate-fade-in">
+
+              {/* Currency note */}
+              <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                <p className="text-xs text-gray-500">
+                  Entering prices in <span className="font-semibold text-gray-700">{currencyLabel}</span>. Switch currency to change the input symbol.
+                </p>
+                <CurrencySwitcher />
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price (USD) *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price ({currencyLabel}) *</label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium select-none">
+                      {currencySymbol}
+                    </span>
                     <input
                       type="number" step="0.01" min="0"
                       className={inputClass + " pl-9"}
@@ -256,7 +285,9 @@ const tabs: {
                     <span className="ml-2 text-xs text-gray-400">(original/crossed out)</span>
                   </label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium select-none">
+                      {currencySymbol}
+                    </span>
                     <input
                       type="number" step="0.01" min="0"
                       className={inputClass + " pl-9"}
@@ -268,13 +299,18 @@ const tabs: {
                 </div>
               </div>
 
-              {form.price && form.compareAt && parseFloat(form.compareAt) > parseFloat(form.price) && (
+              {discountPct !== null && (
                 <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-xl text-sm">
                   <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs flex-shrink-0">
-                    {Math.round(((parseFloat(form.compareAt) - parseFloat(form.price)) / parseFloat(form.compareAt)) * 100)}%
+                    {discountPct}%
                   </div>
                   <p className="text-green-700">
-                    Discount badge will show: <strong>{Math.round(((parseFloat(form.compareAt) - parseFloat(form.price)) / parseFloat(form.compareAt)) * 100)}% off</strong>
+                    Discount badge will show: <strong>{discountPct}% off</strong>
+                    {currency !== "USD" && previewPrice && previewCompareAt && (
+                      <span className="ml-2 font-normal text-green-600">
+                        ({previewCompareAt} → {previewPrice})
+                      </span>
+                    )}
                   </p>
                 </div>
               )}

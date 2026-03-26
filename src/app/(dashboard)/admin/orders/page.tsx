@@ -12,6 +12,11 @@ import {
   Search,
   X,
   Phone,
+  Hash,
+  User,
+  Mail,
+  Calendar,
+  CreditCard,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -289,22 +294,29 @@ export default function AdminOrdersPage() {
                         hasSearch && "bg-amber-50/30"
                       )}
                     >
-                      {/* Order ID */}
+                      {/* Order ID — added Hash icon */}
                       <td className="px-4 py-3.5 pl-5">
-                        <p className="font-mono text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded-lg px-2 py-0.5 inline-flex items-center gap-0.5">
+                        <p className="font-mono text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded-lg px-2 py-0.5 inline-flex items-center gap-1">
+                          <Hash className="w-3 h-3 text-gray-400 flex-shrink-0" />
                           <HighlightedId id={order._id} />
                         </p>
                       </td>
 
-                      {/* Customer */}
+                      {/* Customer — added User/Mail/Phone icons */}
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 font-bold text-xs flex-shrink-0">
                             {order.userName?.[0]?.toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-800 truncate max-w-[130px]">{order.userName}</p>
-                            <p className="text-xs text-gray-400 truncate max-w-[130px]">{order.userEmail}</p>
+                            <p className="text-sm font-semibold text-gray-800 truncate max-w-[130px] flex items-center gap-1">
+                              <User className="w-3 h-3 text-gray-300 flex-shrink-0" />
+                              {order.userName}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate max-w-[130px] flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-gray-300 flex-shrink-0" />
+                              {order.userEmail}
+                            </p>
                             {order.userPhone && (
                               <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                                 <Phone className="w-3 h-3" />
@@ -334,14 +346,20 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
 
-                      {/* Total — now uses format() from useCurrency */}
+                      {/* Total — added CreditCard icon */}
                       <td className="px-4 py-3.5">
-                        <p className="text-sm font-bold text-gray-800">{format(order.total)}</p>
+                        <p className="text-sm font-bold text-gray-800 flex items-center gap-1">
+                          <CreditCard className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                          {format(order.total)}
+                        </p>
                       </td>
 
-                      {/* Date */}
+                      {/* Date — added Calendar icon */}
                       <td className="px-4 py-3.5">
-                        <p className="text-xs text-gray-500 whitespace-nowrap">{formatDate(order.createdAt)}</p>
+                        <p className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                          {formatDate(order.createdAt)}
+                        </p>
                       </td>
 
                       {/* Update Status */}

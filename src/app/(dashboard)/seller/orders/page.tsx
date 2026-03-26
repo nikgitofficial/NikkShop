@@ -2,7 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShoppingCart, Loader2, ChevronRight, Phone } from "lucide-react";
+import {
+  ShoppingCart, Loader2, ChevronRight, Phone,
+  Hash, Calendar, User, MapPin, Package, CreditCard, Tag, Truck,
+} from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -65,21 +68,32 @@ function SellerOrdersInner() {
 
             return (
               <div key={order._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:border-gray-300 transition-colors">
+
+                {/* Header row */}
                 <button
                   className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors text-left"
                   onClick={() => setExpanded(isOpen ? null : order._id)}
                 >
                   <div className="flex items-center gap-4">
-                    <div>
-                      <p className="text-xs text-gray-400 font-mono">#{order._id.slice(-8).toUpperCase()}</p>
-                      <p className="text-sm font-medium text-gray-900">{order.userName}</p>
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <Hash className="w-3 h-3 text-gray-400" />
+                        <p className="text-xs text-gray-400 font-mono">{order._id.slice(-8).toUpperCase()}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3 h-3 text-gray-400" />
+                        <p className="text-sm font-medium text-gray-900">{order.userName}</p>
+                      </div>
                       {order.userPhone && (
-                        <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                          <Phone className="w-3 h-3" />
-                          {order.userPhone}
-                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3 h-3 text-gray-400" />
+                          <p className="text-xs text-gray-400">{order.userPhone}</p>
+                        </div>
                       )}
-                      <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3 h-3 text-gray-400" />
+                        <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
+                      </div>
                     </div>
                     <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLE[order.status] || "bg-gray-100 text-gray-500")}>
                       {order.status}
@@ -95,31 +109,78 @@ function SellerOrdersInner() {
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-gray-100 divide-y divide-gray-100 animate-fade-in">
-                    {myItems.map((item: any, i: number) => (
-                      <div key={i} className="flex items-center gap-3 px-5 py-3">
-                        {item.productImage && (
-                          <img src={item.productImage} alt={item.productName} className="w-11 h-11 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 truncate">{item.productName}</p>
-                          <p className="text-xs text-gray-400">Qty: {item.quantity} × {format(item.price)}</p>
-                        </div>
-                        <span className="text-sm font-bold text-gray-800">{format(item.price * item.quantity)}</span>
+                  <div className="border-t border-gray-100 animate-fade-in">
+
+                    {/* Items section */}
+                    <div className="px-5 pt-4 pb-1">
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <ShoppingCart className="w-3.5 h-3.5 text-gray-400" />
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Items</p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="divide-y divide-gray-100">
+                      {myItems.map((item: any, i: number) => (
+                        <div key={i} className="flex items-center gap-3 px-5 py-3">
+                          {item.productImage && (
+                            <img src={item.productImage} alt={item.productName} className="w-11 h-11 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 truncate">{item.productName}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <Package className="w-3 h-3 text-gray-300" />
+                              <p className="text-xs text-gray-400">Qty: {item.quantity} × {format(item.price)}</p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-gray-800">{format(item.price * item.quantity)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Order total */}
+                    <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <CreditCard className="w-3.5 h-3.5 text-gray-400" />
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Your Earnings</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                          <Tag className="w-3.5 h-3.5 text-gray-300" />
+                          <span>{myItems.length} item{myItems.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        <span className="text-base font-bold text-gray-900">{format(myTotal)}</span>
+                      </div>
+                    </div>
+
+                    {/* Shipping address */}
                     {order.shippingAddress && (
-                      <div className="px-5 py-3 bg-gray-50">
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Ship to</p>
-                        <p className="text-sm text-gray-600">
-                          {order.shippingAddress.name} · {order.shippingAddress.line1}, {order.shippingAddress.city}
-                        </p>
-                        {order.userPhone && (
-                          <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-1">
-                            <Phone className="w-3.5 h-3.5" />
-                            {order.userPhone}
-                          </p>
-                        )}
+                      <div className="px-5 py-4 border-t border-gray-100">
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <Truck className="w-3.5 h-3.5 text-gray-400" />
+                          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ship to</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          {order.shippingAddress.name && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <User className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                              <span>{order.shippingAddress.name}</span>
+                            </div>
+                          )}
+                          {order.userPhone && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <Phone className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                              <span>{order.userPhone}</span>
+                            </div>
+                          )}
+                          {order.shippingAddress.line1 && (
+                            <div className="flex items-start gap-2 text-sm text-gray-600">
+                              <MapPin className="w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" />
+                              <span>
+                                {order.shippingAddress.line1}
+                                {order.shippingAddress.city && `, ${order.shippingAddress.city}`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from "lucide-react";
+import { ChatSellerButton } from "@/components/chat/ChatSellerButton";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCartStore();
@@ -72,10 +73,19 @@ export default function CartPage() {
                 >
                   {item.name}
                 </Link>
-                <p className="text-xs text-gray-400 mt-1">by {item.sellerName}</p>
                 <p className="text-sm font-semibold text-gray-600 mt-2">
                   {format(item.price)}
                 </p>
+                {/* Seller row with chat */}
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-xs text-gray-400">by {item.sellerName}</p>
+                  <ChatSellerButton
+                    sellerId={item.sellerId}
+                    productId={item.productId}
+                    productName={item.name}
+                    productImage={item.image}
+                  />
+                </div>
               </div>
 
               {/* Quantity + Delete row */}
